@@ -1,0 +1,50 @@
+#!/usr/bin/env Rscript
+
+args <- commandArgs(trailingOnly = TRUE)
+
+print_error <- function(obj, name) {
+  cli::cli_h2("{.var {name}}")
+  print(obj)
+}
+
+# Find the errors and extract the extra attributes
+#
+# The `hub_validations` class object contains individual `hub_check` objects.
+# If these objects are errors, they _may_ contain extra data fields passed on
+# to [rlang::error_cnd()]. There is no standard for what extra data fields
+# should be present---they could be `errors`, `error_object`, `missing`, etc.
+# (dependent on context). 
+#
+# However, whenever there _is_ an error, it is important to print these data
+# fields so that users can address errors quickly.
+#
+# This function trims the `hub_validations` object to the ones that caused a
+# failure/error. It then walks through each `hub_check` object and plucks out
+# all of the elements that do not match the arguments to [rlang::error_cnd()].
+#
+# If any elements exist, then they are printed out to the console.
+get_error_data <- function(result) {
+  baddies <- result[purrr::map_lgl(result, hubValidations::not_pass)]
+  reserved <- c("where", names(formals(rlang::error_cnd)))
+  res <- purrr::map(baddies, \(bad) bad[!names(bad) %in% reserved]) |>
+    purrr::compact()
+  if (all(lengths(res)) == 0) {
+    return(NULL)
+  }
+  for (err in names(res)) {
+    cli::cli_h1("{.strong {err}} attributes")
+    purrr::iwalk(res[[err]], print_error)
+  }
+  return(res)
+}
+
+
+result <- hubValidations::validate_pr(
+  hub_path = args[1],
+  gh_repo = args[2],
+  pr_number = args[3]
+)
+x <- try(hubValidations::check_for_errors(result))
+if (!isTRUE(x)) {
+  get_error_data(result)
+}
