@@ -73,7 +73,7 @@ get_error_data <- function(result) {
 }
 
 
-ci_cat("::group::")
+ci_cat("::group::Running Validations\n")
 cli::cli_alert_info("VALIDATING {args[2]}#{args[3]}\n")
 result <- hubValidations::validate_pr(
   hub_path = args[1],
