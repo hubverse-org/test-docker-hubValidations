@@ -1,4 +1,28 @@
 #!/usr/bin/env Rscript
+#
+# Validate a model submission via pull request via (default args)
+# `hubValidations::validate_pr()`
+#
+# USAGE
+#
+#    validate.R [/path/to/hub] [org/repo] [pr]
+#
+# ARGUMENTS
+# 
+#   [/path/to/hub]  path to a local copy of the hub
+#   [org/repo]      github repository name (e.g. reichlab/variant-nowcast-hub)
+#   [pr]            pull request number (e.g. 237)
+# 
+# EXAMPLE
+#
+#   This validates pull request 246 from the variant nowcast hub. The first
+#   two lines clone the repository, so skip them if you already have it locally
+#
+#   ```
+#   tmp=$(mktemp -d)
+#   git clone https://github.com/reichlab/variant-nowcast-hub.git $tmp
+#   validate.R $tmp reichlab/variant-nowcast-hub 246
+#   ```
 
 args <- commandArgs(trailingOnly = TRUE)
 
