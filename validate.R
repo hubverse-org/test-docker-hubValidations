@@ -3,7 +3,7 @@
 args <- commandArgs(trailingOnly = TRUE)
 
 print_error <- function(obj, name) {
-  cli::cli_h2("{.var {name}}")
+  cli::cli_h2("{.var ${name}}")
   print(obj)
 }
 
@@ -32,13 +32,14 @@ get_error_data <- function(result) {
     return(NULL)
   }
   for (err in names(res)) {
-    cli::cli_h1("{.strong {err}} attributes")
+    cli::cli_h1("{.var [{err}]} attributes")
     purrr::iwalk(res[[err]], print_error)
   }
-  return(res)
+  return(invisible(res))
 }
 
 
+cli::cli_alert_info("VALIDATING {args[2]}#{args[3]}")
 result <- hubValidations::validate_pr(
   hub_path = args[1],
   gh_repo = args[2],
