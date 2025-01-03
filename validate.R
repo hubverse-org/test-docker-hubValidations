@@ -26,6 +26,14 @@
 
 args <- commandArgs(trailingOnly = TRUE)
 
+ci_cat <- function(...) {
+  not_ci <- isFALSE(as.logical(Sys.getenv("CI", "false")))
+  if (not_ci) {
+    return(invisible(NULL))
+  }
+  cat(...)
+}
+
 print_error <- function(obj, name) {
   cli::cli_h2("{.var ${name}}")
   print(obj)
@@ -55,21 +63,25 @@ get_error_data <- function(result) {
   if (all(lengths(res)) == 0) {
     return(NULL)
   }
+  ci_cat("::group::Additional error attributes\n")
   for (err in names(res)) {
     cli::cli_h1("{.var [{err}]} attributes")
     purrr::iwalk(res[[err]], print_error)
   }
+  ci_cat("::endgroup::\n")
   return(invisible(res))
 }
 
 
-cli::cli_alert_info("VALIDATING {args[2]}#{args[3]}")
+ci_cat("::group::")
+cli::cli_alert_info("VALIDATING {args[2]}#{args[3]}\n")
 result <- hubValidations::validate_pr(
   hub_path = args[1],
   gh_repo = args[2],
   pr_number = args[3]
 )
 validation_result <- try(hubValidations::check_for_errors(result))
+ci_cat("::endgroup::\n")
 if (!isTRUE(validation_result)) {
   err <- get_error_data(result)
   stop("validation failed", call. = FALSE)
