@@ -45,7 +45,8 @@ result <- hubValidations::validate_pr(
   gh_repo = args[2],
   pr_number = args[3]
 )
-x <- try(hubValidations::check_for_errors(result))
-if (!isTRUE(x)) {
-  get_error_data(result)
+validation_result <- try(hubValidations::check_for_errors(result))
+if (!isTRUE(validation_result)) {
+  err <- get_error_data(result)
+  stop("validation failed", call. = FALSE)
 }
