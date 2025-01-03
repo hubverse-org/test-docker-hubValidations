@@ -1,5 +1,9 @@
 FROM rocker/r-ver:4.3.2
 
+LABEL org.opencontainers.image.description="hubValidations in a tin"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.authors="Zhian N. Kamvar <zkamvar@umass.edu>"
+
 # install general OS utilities
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git
@@ -22,14 +26,8 @@ RUN apt-get install -y --no-install-recommends \
     libpng-dev \
     libtiff5-dev \
     libjpeg-dev \
-    unixodbc-dev
-
-# install system libraries required by pyenv
-RUN apt install -y --no-install-recommends \
-    make \
-    build-essential \
-    curl \
-    git 
+    unixodbc-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /project
 
